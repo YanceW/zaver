@@ -3,7 +3,7 @@
  * Copyright (C) Zhu Jiashun
  * Copyright (C) Zaver
  */
-
+//epoll的简单封装
 #ifndef EPOLL_H
 #define EPOLL_H
 

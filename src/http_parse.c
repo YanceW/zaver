@@ -37,8 +37,9 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
         p = (u_char *)&r->buf[pi % MAX_BUF];
         ch = *p;
 
+		// 解析状态
         switch (state) {
-
+/*****************************************************/
         /* HTTP methods: GET, HEAD, POST */
         case sw_start:
             r->request_start = p;
@@ -53,7 +54,8 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
 
             state = sw_method;
             break;
-
+            
+/*****************************************************/
         case sw_method:
             if (ch == ' ') {
                 r->method_end = p;
@@ -95,6 +97,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
 
             break;
 
+/*****************************************************/
         /* space* before URI */
         case sw_spaces_before_uri:
 
@@ -112,6 +115,8 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
+		// slash斜线
         case sw_after_slash_in_uri:
 
             switch (ch) {
@@ -124,6 +129,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         /* space+ after URI */
         case sw_http:
             switch (ch) {
@@ -147,6 +153,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         case sw_http_HT:
             switch (ch) {
             case 'T':
@@ -157,6 +164,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         case sw_http_HTT:
             switch (ch) {
             case 'P':
@@ -167,6 +175,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         case sw_http_HTTP:
             switch (ch) {
             case '/':
@@ -177,6 +186,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         /* first digit of major HTTP version */
         case sw_first_major_digit:
             if (ch < '1' || ch > '9') {
@@ -201,6 +211,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             r->http_major = r->http_major * 10 + ch - '0';
             break;
 
+/*****************************************************/
         /* first digit of minor HTTP version */
         case sw_first_minor_digit:
             if (ch < '0' || ch > '9') {
@@ -211,6 +222,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             state = sw_minor_digit;
             break;
 
+/*****************************************************/
         /* minor HTTP version or end of request line */
         case sw_minor_digit:
             if (ch == CR) {
@@ -234,6 +246,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             r->http_minor = r->http_minor * 10 + ch - '0';
             break;
 
+/*****************************************************/
         case sw_spaces_after_digit:
             switch (ch) {
             case ' ':
@@ -248,6 +261,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
+/*****************************************************/
         /* end of request line */
         case sw_almost_done:
             r->request_end = p - 1;

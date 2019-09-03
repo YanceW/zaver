@@ -61,21 +61,36 @@ int zv_free_out_t(zv_http_out_t *o) {
 
 void zv_http_handle_header(zv_http_request_t *r, zv_http_out_t *o) {
     list_head *pos;
-    zv_http_header_t *hd;
+   /*
+   首部字段的key:val
+typedef struct zv_http_header_s {
+    void *key_start, *key_end;          // not include end 
+    void *value_start, *value_end;
+    list_head list;
+} zv_http_header_t;
+*/
+
+ zv_http_header_t *hd;
+//处理的字段与函数
     zv_http_header_handle_t *header_in;
     int len;
 
+	// 遍历字段（每次处理结束删除一个链表节点）
     list_for_each(pos, &(r->list)) {
+
         hd = list_entry(pos, zv_http_header_t, list);
         /* handle */
 
-        for (header_in = zv_http_headers_in; 
-            strlen(header_in->name) > 0;
+		// 寻找字段对应的处理函数
+        for (header_in = zv_http_headers_in; //zv全局的字段➕方法的数组
+            strlen(header_in->name) > 0;//非ignore方法
             header_in++) {
             if (strncmp(hd->key_start, header_in->name, hd->key_end - hd->key_start) == 0) {
             
                 //debug("key = %.*s, value = %.*s", hd->key_end-hd->key_start, hd->key_start, hd->value_end-hd->value_start, hd->value_start);
                 len = hd->value_end - hd->value_start;
+                
+                // 处理
                 (*(header_in->handler))(r, o, hd->value_start, len);
                 break;
             }    
@@ -96,6 +111,11 @@ int zv_http_close_conn(zv_http_request_t *r) {
     return ZV_OK;
 }
 
+
+//关于（void），其实是#define Q_UNUSED(X) (void)X;
+//定义或声明却没使用的变量会warning，有的工程-Werror，视warning为错误
+//所以要用（void）忽略这种无关紧要的错误，这种“无用”变量是为了方便以后拓展的预留
+//所以这个函数有啥用？？？^_^
 static int zv_http_process_ignore(zv_http_request_t *r, zv_http_out_t *out, char *data, int len) {
     (void) r;
     (void) out;
@@ -105,6 +125,7 @@ static int zv_http_process_ignore(zv_http_request_t *r, zv_http_out_t *out, char
     return ZV_OK;
 }
 
+//监测长短连接
 static int zv_http_process_connection(zv_http_request_t *r, zv_http_out_t *out, char *data, int len) {
     (void) r;
     if (strncasecmp("keep-alive", data, len) == 0) {
@@ -114,6 +135,7 @@ static int zv_http_process_connection(zv_http_request_t *r, zv_http_out_t *out, 
     return ZV_OK;
 }
 
+//检测
 static int zv_http_process_if_modified_since(zv_http_request_t *r, zv_http_out_t *out, char *data, int len) {
     (void) r;
     (void) len;
@@ -135,9 +157,11 @@ static int zv_http_process_if_modified_since(zv_http_request_t *r, zv_http_out_t
     return ZV_OK;
 }
 
+//状态码到状态短语的转换
 const char *get_shortmsg_from_status_code(int status_code) {
     /*  for code to msg mapping, please check: 
-    * http://users.polytech.unice.fr/~buffa/cours/internet/POLYS/servlets/Servlet-Tutorial-Response-Status-Line.html
+    *
+ http://users.polytech.unice.fr/~buffa/cours/internet/POLYS/servlets/Servlet-Tutorial-Response-Status-Line.html
     */
     if (status_code == ZV_HTTP_OK) {
         return "OK";

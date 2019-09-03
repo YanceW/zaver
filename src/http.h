@@ -15,6 +15,7 @@
 #include "util.h"
 #include "http_request.h"
    
+// header[MAXLINE] body[MAXLINE]
 #define MAXLINE     8192
 #define SHORTLINE   512
 
@@ -27,11 +28,17 @@
     *(uint32_t *) m == ((c3 << 24) | (c2 << 16) | (c1 << 8) | c0)
 
 
+// Accept的内容, 多用途互联网邮件扩展
 typedef struct mime_type_s {
 	const char *type;
 	const char *value;
 } mime_type_t;
 
+/*
+ * @breif		 
+ * @param
+ * @return 
+*/
 void do_request(void *infd);
 
 #endif

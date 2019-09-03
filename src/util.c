@@ -30,6 +30,7 @@ int open_listenfd(int port)
 	    return -1;
  
     /* Eliminates "Address already in use" error from bind. */
+//消除端口已用错误
     if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, 
 		   (const void *)&optval , sizeof(int)) < 0)
 	    return -1;
@@ -73,8 +74,9 @@ int make_socket_non_blocking(int fd) {
 
 /*
 * Read configuration file
-* TODO: trim input line
+* TODO: trim input line修剪？
 */
+//读进来的是个key=val的字串，分割
 int read_conf(char *filename, zv_conf_t *cf, char *buf, int len) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -88,7 +90,7 @@ int read_conf(char *filename, zv_conf_t *cf, char *buf, int len) {
     char *cur_pos = buf+pos;
 
     while (fgets(cur_pos, len-pos, fp)) {
-        delim_pos = strstr(cur_pos, DELIM);
+        delim_pos = strstr(cur_pos, DELIM);//判断后者是否前者子串（delim分隔符
         line_len = strlen(cur_pos);
         
         /*

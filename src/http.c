@@ -311,7 +311,7 @@ static void serve_static(int fd, char *filename, size_t filesize, zv_http_out_t 
 // 在http_request.h
     sprintf(header, "HTTP/1.1 %d %s\r\n", out->status, get_shortmsg_from_status_code(out->status));
 
-// where is TIMEOUT_DEFAULT???
+//在哪呢TIMEOUT_DEFAULT???
     if (out->keep_alive) {
         sprintf(header, "%sConnection: keep-alive\r\n", header);
         sprintf(header, "%sKeep-Alive: timeout=%d\r\n", header, TIMEOUT_DEFAULT);

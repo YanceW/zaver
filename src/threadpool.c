@@ -174,7 +174,7 @@ int threadpool_destroy(zv_threadpool_t *pool, int graceful) {
             log_info("thread %08x exit", (uint32_t) pool->threads[i]);
         }
              
-    } while(0);
+    } while(0);	// 避免goto控制流
 
     if (!err) {
         pthread_mutex_destroy(&(pool->lock));
@@ -202,8 +202,9 @@ static void *threadpool_worker(void *arg) {
             pthread_cond_wait(&(pool->cond), &(pool->lock));
         }
 
+
         if (pool->shutdown == immediate_shutdown) {
-            break;
+            break;											/*!!!!!!!!!!!!!!!!!!!*/
         } else if ((pool->shutdown == graceful_shutdown) && pool->queue_size == 0) {
             break;
         }

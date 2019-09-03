@@ -62,7 +62,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
                 m = r->request_start;
 
                 switch (p - m) {
-
+			//???
                 case 3:
                     if (zv_str3_cmp(m, 'G', 'E', 'T', ' ')) {
                         r->method = ZV_HTTP_GET;
@@ -153,7 +153,6 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
-/*****************************************************/
         case sw_http_HT:
             switch (ch) {
             case 'T':
@@ -164,7 +163,6 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
-/*****************************************************/
         case sw_http_HTT:
             switch (ch) {
             case 'P':
@@ -175,7 +173,6 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             }
             break;
 
-/*****************************************************/
         case sw_http_HTTP:
             switch (ch) {
             case '/':
@@ -221,8 +218,7 @@ int zv_http_parse_request_line(zv_http_request_t *r) {
             r->http_minor = ch - '0';
             state = sw_minor_digit;
             break;
-
-/*****************************************************/
+            
         /* minor HTTP version or end of request line */
         case sw_minor_digit:
             if (ch == CR) {
@@ -318,6 +314,7 @@ int zv_http_parse_request_body(zv_http_request_t *r) {
         ch = *p;
 
         switch (state) {
+/*****************************************************/
         case sw_start:
             if (ch == CR || ch == LF) {
                 break;
@@ -326,6 +323,8 @@ int zv_http_parse_request_body(zv_http_request_t *r) {
             r->cur_header_key_start = p;
             state = sw_key;
             break;
+/*****************************************************/
+		// colon 冒号
         case sw_key:
             if (ch == ' ') {
                 r->cur_header_key_end = p;
@@ -340,6 +339,7 @@ int zv_http_parse_request_body(zv_http_request_t *r) {
             }
 
             break;
+/*****************************************************/
         case sw_spaces_before_colon:
             if (ch == ' ') {
                 break;
@@ -349,6 +349,7 @@ int zv_http_parse_request_body(zv_http_request_t *r) {
             } else {
                 return ZV_HTTP_PARSE_INVALID_HEADER;
             }
+/*****************************************************/
         case sw_spaces_after_colon:
             if (ch == ' ') {
                 break;
@@ -357,6 +358,7 @@ int zv_http_parse_request_body(zv_http_request_t *r) {
             state = sw_value;
             r->cur_header_value_start = p;
             break;
+/*****************************************************/
         case sw_value:
             if (ch == CR) {
                 r->cur_header_value_end = p;
